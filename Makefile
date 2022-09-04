@@ -7,4 +7,7 @@ migrateup:
 migratedown:
 	migrate -path db/migrations -database "postgresql://postgres:postgres@localhost:5434/simple?sslmode=disable" -verbose down
 
-.PHONY: postgres migrateup migratedown
+sqlc:
+	sqlc generate
+
+.PHONY: postgres migrateup migratedown sqlc

@@ -6,11 +6,11 @@ CREATE TYPE "Currency" AS ENUM (
 
 CREATE TABLE "account" (
   "id" BIGSERIAL PRIMARY KEY,
-  "created" timestamptz,
+  "created" timestamptz DEFAULT (now()),
   "code" int,
   "owner" varchar,
   "balance" bigint,
-  "currency" varchar NOT NULL DEFAULT (now())
+  "currency" varchar NOT NULL
 );
 
 CREATE TABLE "entry" (
