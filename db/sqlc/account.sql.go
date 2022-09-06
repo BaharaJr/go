@@ -7,7 +7,8 @@ package db
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 const createAccount = `-- name: CreateAccount :one
@@ -22,9 +23,9 @@ RETURNING id, created, code, owner, balance, currency
 `
 
 type CreateAccountParams struct {
-	Owner    sql.NullString `json:"owner"`
-	Balance  sql.NullInt64  `json:"balance"`
-	Currency string         `json:"currency"`
+	Owner    string `json:"owner"`
+	Balance  int64  `json:"balance"`
+	Currency string `json:"currency"`
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
@@ -39,4 +40,149 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 		&i.Currency,
 	)
 	return i, err
+}
+
+const deleteAccount = `-- name: DeleteAccount :exec
+DELETE FROM ACCOUNT WHERE id = $1
+`
+
+func (q *Queries) DeleteAccount(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteAccount, id)
+	return err
+}
+
+const genericSearch = `-- name: GenericSearch :many
+SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE $1 = $2 
+ORDER BY CREATED ASC
+ LIMIT $1
+ OFFSET $2
+`
+
+type GenericSearchParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) GenericSearch(ctx context.Context, arg GenericSearchParams) ([]Account, error) {
+	rows, err := q.db.QueryContext(ctx, genericSearch, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Account{}
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.Created,
+			&i.Code,
+			&i.Owner,
+			&i.Balance,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAccountById = `-- name: GetAccountById :one
+SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE ID=$1 LIMIT 1
+`
+
+func (q *Queries) GetAccountById(ctx context.Context, id uuid.UUID) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccountById, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Code,
+		&i.Owner,
+		&i.Balance,
+		&i.Currency,
+	)
+	return i, err
+}
+
+const getAccountByOwner = `-- name: GetAccountByOwner :one
+SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE OWNER=$1 LIMIT 1
+`
+
+func (q *Queries) GetAccountByOwner(ctx context.Context, owner string) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccountByOwner, owner)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Code,
+		&i.Owner,
+		&i.Balance,
+		&i.Currency,
+	)
+	return i, err
+}
+
+const getAccounts = `-- name: GetAccounts :many
+SELECT id, created, code, owner, balance, currency FROM ACCOUNT 
+ORDER BY CREATED ASC
+ LIMIT $1
+ OFFSET $2
+`
+
+type GetAccountsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) GetAccounts(ctx context.Context, arg GetAccountsParams) ([]Account, error) {
+	rows, err := q.db.QueryContext(ctx, getAccounts, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Account{}
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.Created,
+			&i.Code,
+			&i.Owner,
+			&i.Balance,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateAccount = `-- name: UpdateAccount :exec
+UPDATE ACCOUNT 
+SET BALANCE = $2
+WHERE ID = $1
+`
+
+type UpdateAccountParams struct {
+	ID      uuid.UUID `json:"id"`
+	Balance int64     `json:"balance"`
+}
+
+func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) error {
+	_, err := q.db.ExecContext(ctx, updateAccount, arg.ID, arg.Balance)
+	return err
 }

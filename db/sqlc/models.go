@@ -9,6 +9,8 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Currency string
@@ -55,24 +57,24 @@ func (ns NullCurrency) Value() (driver.Value, error) {
 }
 
 type Account struct {
-	ID       int64          `json:"id"`
-	Created  sql.NullTime   `json:"created"`
-	Code     sql.NullInt32  `json:"code"`
-	Owner    sql.NullString `json:"owner"`
-	Balance  sql.NullInt64  `json:"balance"`
+	ID       uuid.UUID      `json:"id"`
+	Created  time.Time      `json:"created"`
+	Code     sql.NullString `json:"code"`
+	Owner    string         `json:"owner"`
+	Balance  int64          `json:"balance"`
 	Currency string         `json:"currency"`
 }
 
 type Entry struct {
-	ID      int64         `json:"id"`
+	ID      uuid.UUID     `json:"id"`
 	Amount  int64         `json:"amount"`
-	Account sql.NullInt64 `json:"account"`
+	Account uuid.NullUUID `json:"account"`
 	Created time.Time     `json:"created"`
 }
 
 type Transfer struct {
-	ID       int64         `json:"id"`
-	Sender   sql.NullInt64 `json:"sender"`
-	Receiver sql.NullInt64 `json:"receiver"`
-	Created  sql.NullTime  `json:"created"`
+	ID       uuid.UUID     `json:"id"`
+	Sender   uuid.NullUUID `json:"sender"`
+	Receiver uuid.NullUUID `json:"receiver"`
+	Created  time.Time     `json:"created"`
 }
