@@ -20,10 +20,12 @@ ORDER BY CREATED ASC
  LIMIT $1
  OFFSET $2;
 
- -- name: UpdateAccount :exec
+ -- name: UpdateAccount :one
 UPDATE ACCOUNT 
 SET BALANCE = $2
-WHERE ID = $1;
+WHERE ID = $1
+RETURNING *
+;
 
 -- name: GenericSearch :many
 SELECT * FROM ACCOUNT WHERE $1 = $2 

@@ -17,7 +17,7 @@ type Querier interface {
 	GetAccountById(ctx context.Context, id uuid.UUID) (Account, error)
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccounts(ctx context.Context, arg GetAccountsParams) ([]Account, error)
-	UpdateAccount(ctx context.Context, arg UpdateAccountParams) error
+	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 }
 
 var _ Querier = (*Queries)(nil)
