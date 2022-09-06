@@ -54,17 +54,24 @@ func (q *Queries) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 const genericSearch = `-- name: GenericSearch :many
 SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE $1 = $2 
 ORDER BY CREATED ASC
- LIMIT $1
- OFFSET $2
+ LIMIT $3
+ OFFSET $4
 `
 
 type GenericSearchParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Column1 interface{} `json:"column_1"`
+	Column2 interface{} `json:"column_2"`
+	Limit   int32       `json:"limit"`
+	Offset  int32       `json:"offset"`
 }
 
 func (q *Queries) GenericSearch(ctx context.Context, arg GenericSearchParams) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, genericSearch, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, genericSearch,
+		arg.Column1,
+		arg.Column2,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}

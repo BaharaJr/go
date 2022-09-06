@@ -28,10 +28,10 @@ RETURNING *
 ;
 
 -- name: GenericSearch :many
-SELECT * FROM ACCOUNT WHERE $1 = $2 
+SELECT * FROM ACCOUNT WHERE $1 = $2
 ORDER BY CREATED ASC
- LIMIT $1
- OFFSET $2;
+ LIMIT $3
+ OFFSET $4;
 
 -- name: DeleteAccount :exec
 DELETE FROM ACCOUNT WHERE id = $1;

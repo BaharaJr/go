@@ -82,3 +82,32 @@ func TestDeleteAccount(t *testing.T) {
 	require.Empty(t, account2)
 
 }
+
+func TestListAccounts(t *testing.T) {
+	arg := GetAccountsParams{
+		Limit:  2,
+		Offset: 0,
+	}
+	accounts, err := testQueries.GetAccounts(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, accounts, 2)
+
+	for _, account := range accounts {
+		require.NotEmpty(t, account)
+	}
+}
+
+func TestGenericSearch(t *testing.T) {
+	arg := GenericSearchParams{
+		Column1: "owner",
+		Column2: "Bennett",
+		Limit:   2,
+		Offset:  0,
+	}
+	accounts, err := testQueries.GenericSearch(context.Background(), arg)
+	require.NoError(t, err)
+
+	for _, account := range accounts {
+		require.NotEmpty(t, account)
+	}
+}
