@@ -1,3 +1,19 @@
+-- FUNCTION: public.uuid_generate_v4()
+
+-- DROP FUNCTION IF EXISTS public.uuid_generate_v4();
+
+CREATE OR REPLACE FUNCTION public.uuid_generate_v4(
+	)
+    RETURNS uuid
+    LANGUAGE 'c'
+    COST 1
+    VOLATILE STRICT PARALLEL SAFE 
+AS '$libdir/uuid-ossp', 'uuid_generate_v4'
+;
+
+ALTER FUNCTION public.uuid_generate_v4()
+    OWNER TO postgres;
+
 CREATE TYPE "Currency" AS ENUM (
   'USD',
   'Tshs',
@@ -5,26 +21,26 @@ CREATE TYPE "Currency" AS ENUM (
 );
 
 CREATE TABLE "account" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "created" timestamptz DEFAULT (now()),
-  "code" int,
-  "owner" varchar,
-  "balance" bigint,
+  "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "created" timestamptz NOT NULL DEFAULT (now()),
+  "code" varchar,
+  "owner" varchar NOT NULL,
+  "balance" BIGSERIAL NOT NULL,
   "currency" varchar NOT NULL
 );
 
 CREATE TABLE "entry" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "amount" bigint NOT NULL,
-  "account" bigint,
+  "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "amount" BIGSERIAL NOT NULL,
+  "account" uuid,
   "created" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "transfer" (
-  "id" bigint PRIMARY KEY,
-  "sender" bigint,
-  "receiver" bigint,
-  "created" timestamptz DEFAULT (now())
+  "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "sender" uuid,
+  "receiver" uuid,
+  "created" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE INDEX ON "account" ("owner");
