@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	// "database/sql"
 	"testing"
 
 	"github.com/BaharaJr/go/util"
