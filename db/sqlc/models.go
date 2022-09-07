@@ -66,15 +66,15 @@ type Account struct {
 }
 
 type Entry struct {
-	ID      uuid.UUID     `json:"id"`
-	Amount  int64         `json:"amount"`
-	Account uuid.NullUUID `json:"account"`
-	Created time.Time     `json:"created"`
+	ID      uuid.UUID `json:"id"`
+	Amount  int64     `json:"amount"`
+	Account uuid.UUID `json:"account"`
+	Created time.Time `json:"created"`
 }
 
 type Transfer struct {
-	ID       uuid.UUID     `json:"id"`
-	Sender   uuid.NullUUID `json:"sender"`
-	Receiver uuid.NullUUID `json:"receiver"`
-	Created  time.Time     `json:"created"`
+	ID       uuid.UUID `json:"id"`
+	Sender   uuid.UUID `json:"sender"`
+	Receiver uuid.UUID `json:"receiver"`
+	Created  time.Time `json:"created"`
 }

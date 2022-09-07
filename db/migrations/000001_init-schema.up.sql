@@ -32,14 +32,14 @@ CREATE TABLE "account" (
 CREATE TABLE "entry" (
   "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   "amount" BIGSERIAL NOT NULL,
-  "account" uuid,
+  "account" uuid NOT NULL,
   "created" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "transfer" (
   "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "sender" uuid,
-  "receiver" uuid,
+  "sender" uuid  NOT NULL,
+  "receiver" uuid  NOT NULL,
   "created" timestamptz NOT NULL DEFAULT (now())
 );
 

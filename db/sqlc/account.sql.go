@@ -52,7 +52,7 @@ func (q *Queries) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 }
 
 const genericSearch = `-- name: GenericSearch :many
-SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE $1 = $2 
+SELECT id, created, code, owner, balance, currency FROM ACCOUNT WHERE $1 = $2
 ORDER BY CREATED ASC
  LIMIT $3
  OFFSET $4
