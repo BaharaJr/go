@@ -40,6 +40,7 @@ CREATE TABLE "transfer" (
   "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   "sender" uuid  NOT NULL,
   "receiver" uuid  NOT NULL,
+  "amount" BIGSERIAL NOT NULL,
   "created" timestamptz NOT NULL DEFAULT (now())
 );
 

@@ -76,5 +76,6 @@ type Transfer struct {
 	ID       uuid.UUID `json:"id"`
 	Sender   uuid.UUID `json:"sender"`
 	Receiver uuid.UUID `json:"receiver"`
+	Amount   int64     `json:"amount"`
 	Created  time.Time `json:"created"`
 }
