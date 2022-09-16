@@ -4,20 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/google/uuid"
 )
 
-// store provides all queries and functions on transactions
-type Store struct {
-	*Queries
-	db *sql.DB
+// Store defines all functions to execute db queries and transactions
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg CreateTransferParams) (TransferResult, error)
 }
 
-// TransferTxParams contains all necessary input parameters to transfer money from one account to another
-type TransferTxParams struct {
-	Sender   uuid.UUID `json:"sender"`
-	Receiver uuid.UUID `json:"receiver"`
-	Amount   int64     `json:"amount"`
+// SQLStore provides all functions to execute SQL queries and transactions
+type SQLStore struct {
+	db *sql.DB
+	*Queries
 }
 
 //Result of th transfer transaction
@@ -31,17 +29,19 @@ type TransferResult struct {
 }
 
 // create new store
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+// NewStore creates a new store
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
 // create store execution context
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, nil)
-
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
+	var err error
+	var tx *sql.Tx
+	tx, err = store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 }
 
 // TransferTx performs a money transfer transaction from one account to another
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg CreateTransferParams) (TransferResult, error) {
 	var result TransferResult
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
